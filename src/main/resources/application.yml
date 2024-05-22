@@ -30,13 +30,6 @@ spring:
           key: ${SECRET_KEY:secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret1234secret}
 
   mail:
-    host: smtp.gmail.com
-    port: 587
+    host: smtp.email.ap-chuncheon-1.oci.oraclecloud.com
     username: ${GMAIL_USERNAME}
     password: ${GMAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
