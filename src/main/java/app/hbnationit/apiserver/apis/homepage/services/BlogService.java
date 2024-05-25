@@ -13,14 +13,11 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static app.hbnationit.apiserver.apis.homepage.models.QBlog.*;
 
@@ -34,14 +31,25 @@ public class BlogService {
         this.queryFactory = queryFactory;
     }
 
-    public ResponseEntity<BlogResponse> findBlog(Long id) {
-        Blog dao = repository.findById(id).orElseThrow(() ->
+    public Blog findBlog(Long id) {
+        return repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found Blog"));
-
-        return ResponseEntity.status(HttpStatus.OK).body(toVo(dao));
     }
 
-    public ResponseEntity<Page<BlogsResponse>> findBlogs(
+    public BlogResponse findBlogVo(Long id) {
+        Blog dao = findBlog(id);
+        return BlogResponse.builder()
+                .id(dao.getId())
+                .name(dao.getName())
+                .description(dao.getDescription())
+                .tags(new HashSet<>(Arrays.asList(dao.getTags().split(","))))
+                .image(dao.getImage())
+                .content(dao.getContent())
+                .createdAt(dao.getCreatedAt())
+                .build();
+    }
+
+    public Page<Blog> findBlogs(
             Pageable pageable, String name, String tags, String description
     ) {
         JPAQuery<Long> countQuery = queryFactory.select(blog.count()).from(blog);
@@ -49,15 +57,27 @@ public class BlogService {
         setQuery(countQuery, name, tags, description);
         setQuery(contentQuery, name, tags, description);
 
-        List<BlogsResponse> contents = contentQuery.fetch().stream().map(this::toVos).toList();
-        Long count = (Long) countQuery.fetchOne();
+        List<Blog> contents = contentQuery.fetch();
+        Long count = countQuery.fetchOne();
 
-        Page<BlogsResponse> vo = new PageImpl<>(contents, pageable, count);
-        return ResponseEntity.status(HttpStatus.OK).body(vo);
+        return new PageImpl<>(contents, pageable, count);
+    }
+
+    public Page<BlogsResponse> findBlogsVo(
+            Pageable pageable, String name, String tags, String description
+    ) {
+        return findBlogs(pageable, name, tags, description).map(dao -> BlogsResponse.builder()
+                .id(dao.getId())
+                .name(dao.getName())
+                .description(dao.getDescription())
+                .tags(new HashSet<>(Arrays.asList(dao.getTags().split(","))))
+                .image(dao.getImage())
+                .createdAt(dao.getCreatedAt())
+                .build());
     }
 
     @Transactional
-    public ResponseEntity<BlogResponse> addBlog(AddBlogRequest dto) {
+    public Blog addBlog(AddBlogRequest dto) {
         String tags = String.join(",", dto.getTags());
 
         Blog dao = Blog.builder()
@@ -68,13 +88,11 @@ public class BlogService {
                 .image(dto.getImage())
                 .content(dto.getContent())
                 .build();
-        dao = repository.save(dao);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(toVo(dao));
+        return repository.save(dao);
     }
 
     @Transactional
-    public ResponseEntity<BlogResponse> modifyBlog(Long id, ModifyBlogRequest dto) {
+    public Blog modifyBlog(Long id, ModifyBlogRequest dto) {
         Blog dao = repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found Blog"));
         String tags = String.join(",", dto.getTags());
@@ -85,42 +103,12 @@ public class BlogService {
         dao.setImage(dto.getImage());
         dao.setContent(dto.getContent());
 
-        return ResponseEntity.status(HttpStatus.OK).body(toVo(dao));
+        return dao;
     }
 
     @Transactional
-    public ResponseEntity<?> removeBlog(Long id) {
+    public void removeBlog(Long id) {
         repository.deleteById(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    private BlogResponse toVo(Blog dao) {
-        Set<String> tags = new HashSet<>(Arrays.asList(dao.getTags().split(",")));
-
-        return BlogResponse.builder()
-                .id(dao.getId())
-                .name(dao.getName())
-                .description(dao.getDescription())
-                .tags(tags)
-                .view(dao.getView())
-                .image(dao.getImage())
-                .content(dao.getContent())
-                .createdAt(dao.getCreatedAt())
-                .build();
-    }
-
-    private BlogsResponse toVos(Blog dao) {
-        Set<String> tags = new HashSet<>(Arrays.asList(dao.getTags().split(",")));
-
-        return BlogsResponse.builder()
-                .id(dao.getId())
-                .name(dao.getName())
-                .description(dao.getDescription())
-                .tags(tags)
-                .view(dao.getView())
-                .image(dao.getImage())
-                .createdAt(dao.getCreatedAt())
-                .build();
     }
 
     private void setQuery(JPAQuery<?> query, String name, String tags, String description) {

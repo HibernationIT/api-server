@@ -26,9 +26,8 @@ public class SecurityConfig {
                         .configurationSource(corsConfigurationSource)
                 )
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/v1/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/v1/homepage/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/v1/console/**").permitAll()
+                        .anyRequest().permitAll()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement(session -> session

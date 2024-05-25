@@ -35,12 +35,55 @@ public class ProjectService {
         this.queryFactory = queryFactory;
     }
 
-    public ResponseEntity<ProjectResponse> findProject(Long id) {
-        ProjectResponse vo = getOne(id);
-        return ResponseEntity.status(HttpStatus.CREATED).body(vo);
+    public Project findProject(Long id) {
+        return repository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Not found Project"));
     }
 
-    public ResponseEntity<Page<ProjectsResponse>> findProjects(
+    public ProjectResponse findProjectVo(Long id) {
+        List<ProjectResponse> vo = queryFactory
+                .from(project)
+                .join(stack).on(project.stacks.contains(stack.name))
+                .where(project.id.eq(id))
+                .transform(
+                        groupBy(project.id).list(
+                                Projections.fields(ProjectResponse.class,
+                                        project.id,
+                                        project.name,
+                                        project.link,
+                                        project.description,
+                                        GroupBy.set(Projections.fields(ProjectResponse.Stack.class,
+                                                stack.name,
+                                                stack.image
+                                        )).as("stacks"),
+                                        project.image,
+                                        project.content,
+                                        project.createdAt
+                                )
+                        )
+                );
+        if (vo.size() == 0) {
+            throw new EntityNotFoundException("Not found Project");
+        }
+
+        return vo.get(0);
+    }
+
+    public Page<Project> findProjects(
+            Pageable pageable, String name, String stacks, String description
+    ) {
+        JPAQuery<Long> countQuery = queryFactory.select(project.count()).from(project);
+        JPAQuery<Project> contentsQuery = queryFactory.selectFrom(project);
+        setQuery(countQuery, name, stacks, description);
+        setQuery(contentsQuery, name, stacks, description);
+
+        List<Project> contents = contentsQuery.fetch();
+        Long count = countQuery.fetchOne();
+
+        return new PageImpl<>(contents, pageable, count);
+    }
+
+    public Page<ProjectsResponse> findProjectsVo(
             Pageable pageable, String name, String stacks, String description
     ) {
         JPAQuery<?> countQuery = queryFactory.select(project.count()).from(project);
@@ -68,12 +111,11 @@ public class ProjectService {
         );
         Long count = (Long) countQuery.fetchOne();
 
-        Page<ProjectsResponse> vo = new PageImpl<>(contents, pageable, count);
-        return ResponseEntity.status(HttpStatus.OK).body(vo);
+        return new PageImpl<>(contents, pageable, count);
     }
 
     @Transactional
-    public ResponseEntity<ProjectResponse> addProject(AddProjectRequest dto) {
+    public Project addProject(AddProjectRequest dto) {
         String stacks = String.join(",", dto.getStacks());
 
         Project dao = Project.builder()
@@ -85,13 +127,11 @@ public class ProjectService {
                 .image(dto.getImage())
                 .content(dto.getContent())
                 .build();
-        dao = repository.save(dao);
-;
-        return ResponseEntity.status(HttpStatus.CREATED).body(getOne(dao.getId()));
+        return repository.save(dao);
     }
 
     @Transactional
-    public ResponseEntity<ProjectResponse> modifyProject(Long id, ModifyProjectRequest dto) {
+    public Project modifyProject(Long id, ModifyProjectRequest dto) {
         Project dao = repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found Project"));
         String stacks = String.join(",", dto.getStacks());
@@ -102,43 +142,12 @@ public class ProjectService {
         dao.setView(dto.getView());
         dao.setImage(dto.getImage());
         dao.setContent(dto.getContent());
-
-        return ResponseEntity.status(HttpStatus.OK).body(getOne(dao.getId()));
+        return dao;
     }
 
     @Transactional
-    public ResponseEntity<?> removeProject(Long id) {
+    public void removeProject(Long id) {
         repository.deleteById(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    private ProjectResponse getOne(Long id) {
-        List<ProjectResponse> vo = queryFactory
-                .from(project)
-                .join(stack).on(project.stacks.contains(stack.name))
-                .where(project.id.eq(id))
-                .transform(
-                        groupBy(project.id).list(
-                                Projections.fields(ProjectResponse.class,
-                                        project.id,
-                                        project.name,
-                                        project.link,
-                                        project.description,
-                                        GroupBy.set(Projections.fields(ProjectResponse.Stack.class,
-                                                stack.name,
-                                                stack.image
-                                        )).as("stacks"),
-                                        project.image,
-                                        project.content,
-                                        project.createdAt
-                                )
-                        )
-                );
-        if (vo.size() == 0) {
-            throw new EntityNotFoundException("Not found Project");
-        }
-
-        return vo.get(0);
     }
 
     private void setQuery(JPAQuery<?> query, String name, String stacks, String description) {

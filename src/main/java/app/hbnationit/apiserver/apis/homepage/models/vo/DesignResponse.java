@@ -3,38 +3,42 @@ package app.hbnationit.apiserver.apis.homepage.models.vo;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.Set;
 
 @NoArgsConstructor
-public @Getter class BlogsResponse {
+public @Getter @Setter class DesignResponse {
     private Long id;
     private String name;
+    private String link;
     private String description;
-    private Set<String> tags;
     private String image;
+    private Set<String> designs;
     private LocalDateTime createdAt;
 
     @Builder
-    public BlogsResponse(Long id, String name, String description, Set<String> tags, String image, LocalDateTime createdAt) {
+    public DesignResponse(Long id, String name, String link, String description, String image, Set<String> designs, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
+        this.link = link;
         this.description = description;
-        this.tags = tags;
         this.image = image;
+        this.designs = designs;
         this.createdAt = createdAt;
     }
 
     @Override
     public String toString() {
-        return "BlogsResponse{" +
+        return "DesignResponse{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", link='" + link + '\'' +
                 ", description='" + description + '\'' +
-                ", tags=" + tags +
                 ", image='" + image + '\'' +
-                ", createdAt=" + createdAt +
+                ", designs=" + designs +
+                ", createdAt='" + createdAt + '\'' +
                 '}';
     }
 }

@@ -13,18 +13,16 @@ public @Getter class BlogResponse {
     private String name;
     private String description;
     private Set<String> tags;
-    private Boolean view;
     private String image;
     private String content;
     private LocalDateTime createdAt;
 
     @Builder
-    public BlogResponse(Long id, String name, String description, Set<String> tags, Boolean view, String image, String content, LocalDateTime createdAt) {
+    public BlogResponse(Long id, String name, String description, Set<String> tags, String image, String content, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.tags = tags;
-        this.view = view;
         this.image = image;
         this.content = content;
         this.createdAt = createdAt;
@@ -37,7 +35,6 @@ public @Getter class BlogResponse {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", tags=" + tags +
-                ", view=" + view +
                 ", image='" + image + '\'' +
                 ", content='" + content + '\'' +
                 ", createdAt='" + createdAt + '\'' +
