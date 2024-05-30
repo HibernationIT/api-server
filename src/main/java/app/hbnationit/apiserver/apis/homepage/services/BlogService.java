@@ -38,6 +38,7 @@ public class BlogService {
 
     public BlogResponse findBlogVo(Long id) {
         Blog dao = findBlog(id);
+        if (!dao.getView()) { throw new EntityNotFoundException("Not found Blog"); }
         return BlogResponse.builder()
                 .id(dao.getId())
                 .name(dao.getName())
@@ -66,14 +67,17 @@ public class BlogService {
     public Page<BlogsResponse> findBlogsVo(
             Pageable pageable, String name, String tags, String description
     ) {
-        return findBlogs(pageable, name, tags, description).map(dao -> BlogsResponse.builder()
-                .id(dao.getId())
-                .name(dao.getName())
-                .description(dao.getDescription())
-                .tags(new HashSet<>(Arrays.asList(dao.getTags().split(","))))
-                .image(dao.getImage())
-                .createdAt(dao.getCreatedAt())
-                .build());
+        return (Page<BlogsResponse>) findBlogs(pageable, name, tags, description)
+                .filter(Blog::getView)
+                .map(dao -> BlogsResponse.builder()
+                    .id(dao.getId())
+                    .name(dao.getName())
+                    .description(dao.getDescription())
+                    .tags(new HashSet<>(Arrays.asList(dao.getTags().split(","))))
+                    .image(dao.getImage())
+                    .createdAt(dao.getCreatedAt())
+                    .build())
+                ;
     }
 
     @Transactional

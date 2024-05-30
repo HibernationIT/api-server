@@ -1,15 +1,8 @@
 package app.hbnationit.apiserver.apis.homepage.controllers;
 
 import app.hbnationit.apiserver.apis.homepage.models.dto.*;
-import app.hbnationit.apiserver.apis.homepage.models.vo.ProjectResponse;
-import app.hbnationit.apiserver.apis.homepage.models.vo.ProjectsResponse;
-import app.hbnationit.apiserver.apis.homepage.models.vo.StackResponse;
-import app.hbnationit.apiserver.apis.homepage.services.BlogService;
-import app.hbnationit.apiserver.apis.homepage.services.DesignService;
-import app.hbnationit.apiserver.apis.homepage.services.ProjectService;
-import app.hbnationit.apiserver.apis.homepage.services.StackService;
+import app.hbnationit.apiserver.apis.homepage.services.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +16,7 @@ public class ConsoleHomepageController {
     private final ProjectService projectService;
     private final BlogService blogService;
     private final DesignService designService;
+    private final IconService iconService;
 
     /*
     ========================================
@@ -44,7 +38,6 @@ public class ConsoleHomepageController {
                 .status(HttpStatus.CREATED)
                 .body(stackService.addStack(body));
     }
-
     @PutMapping("/stacks/{name}")
     public ResponseEntity<?> stackModify(
             @PathVariable(name = "name") String name,
@@ -54,7 +47,6 @@ public class ConsoleHomepageController {
                 .status(HttpStatus.OK)
                 .body(stackService.modifyStack(name, body));
     }
-
     @DeleteMapping("/stacks/{name}")
     public ResponseEntity<?> stackRemove(@PathVariable(name = "name") String name) {
         stackService.removeStack(name);
@@ -74,7 +66,6 @@ public class ConsoleHomepageController {
                 .status(HttpStatus.OK)
                 .body(projectService.findProject(id));
     }
-
     @GetMapping("/projects")
     public ResponseEntity<?> projectList(
             Pageable pageable,
@@ -86,14 +77,12 @@ public class ConsoleHomepageController {
                 .status(HttpStatus.OK)
                 .body(projectService.findProjects(pageable, name, stacks, description));
     }
-
     @PostMapping("/projects")
     public ResponseEntity<?> projectAdd(@RequestBody AddProjectRequest body) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(projectService.addProject(body));
     }
-
     @PutMapping("/projects/{id}")
     public ResponseEntity<?> projectModify(
             @PathVariable(name = "id") Long id,
@@ -103,8 +92,7 @@ public class ConsoleHomepageController {
                 .status(HttpStatus.OK)
                 .body(projectService.modifyProject(id, body));
     }
-
-    @PutMapping("/projects/{id}")
+    @DeleteMapping("/projects/{id}")
     public ResponseEntity<?> projectRemove(@PathVariable(name = "id") Long id) {
         projectService.removeProject(id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -121,7 +109,6 @@ public class ConsoleHomepageController {
                 .status(HttpStatus.OK)
                 .body(blogService.findBlog(id));
     }
-
     @GetMapping("/blogs")
     public ResponseEntity<?> blogList(
             Pageable pageable,
@@ -139,7 +126,6 @@ public class ConsoleHomepageController {
                 .status(HttpStatus.CREATED)
                 .body(blogService.addBlog(body));
     }
-
     @PutMapping("/blogs/{id}")
     public ResponseEntity<?> blogModify(
             @PathVariable(name = "id") Long id,
@@ -149,7 +135,6 @@ public class ConsoleHomepageController {
                 .status(HttpStatus.OK)
                 .body(blogService.modifyBlog(id, body));
     }
-
     @DeleteMapping("/blogs/{id}")
     public ResponseEntity<?> blogRemove(@PathVariable(name = "id") Long id) {
         blogService.removeBlog(id);
@@ -163,14 +148,13 @@ public class ConsoleHomepageController {
     Designs
     ========================================
     */
-    @GetMapping("/design/{id}")
+    @GetMapping("/designs/{id}")
     public ResponseEntity<?> designDetails(@PathVariable(name = "id") Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(designService.findDesign(id));
     }
-
-    @GetMapping("/design")
+    @GetMapping("/designs")
     public ResponseEntity<?> designList(
             Pageable pageable,
             @RequestParam(required = false) String name,
@@ -180,14 +164,13 @@ public class ConsoleHomepageController {
                 .status(HttpStatus.OK)
                 .body(designService.findDesigns(pageable, name, description));
     }
-    @PostMapping("/design")
+    @PostMapping("/designs")
     public ResponseEntity<?> designAdd(@RequestBody AddDesignRequest body) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(designService.addDesign(body));
     }
-
-    @PutMapping("/design/{id}")
+    @PutMapping("/designs/{id}")
     public ResponseEntity<?> designModify(
             @PathVariable(name = "id") Long id,
             @RequestBody ModifyDesignRequest body
@@ -196,8 +179,7 @@ public class ConsoleHomepageController {
                 .status(HttpStatus.OK)
                 .body(designService.modifyDesign(id, body));
     }
-
-    @DeleteMapping("/design/{id}")
+    @DeleteMapping("/designs/{id}")
     public ResponseEntity<?> designRemove(@PathVariable(name = "id") Long id) {
         designService.removeDesign(id);
         return ResponseEntity
@@ -205,5 +187,45 @@ public class ConsoleHomepageController {
                 .build();
     }
 
+    /*
+    ========================================
+    Icons
+    ========================================
+    */
+    @GetMapping("/icons")
+    public ResponseEntity<?> iconsList(
+            Pageable pageable,
+            @RequestParam(required = false) String name
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(iconService.findIcons(pageable, name));
+    }
 
+    @PostMapping("/icons")
+    public ResponseEntity<?> iconAdd(@RequestBody AddIconRequest body) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(iconService.addIcon(body));
+    }
+
+    @PutMapping("/icons/{name}")
+    public ResponseEntity<?> iconModify(
+            @PathVariable(name = "name") String name,
+            @RequestBody ModifyIconRequest body
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(iconService.modifyIcon(name, body));
+    }
+
+    @DeleteMapping("/icons/{name}")
+    public ResponseEntity<?> iconRemove(
+            @PathVariable(name = "name") String name
+    ) {
+        iconService.removeIcon(name);
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build();
+    }
 }

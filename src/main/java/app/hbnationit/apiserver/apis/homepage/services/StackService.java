@@ -20,22 +20,23 @@ public class StackService {
         this.repository = repository;
     }
 
-    public Page<StackResponse> findStacksVo(Pageable pageable, String type) {
-        return findStacks(pageable, type).map(dao -> StackResponse.builder()
-                .name(dao.getName())
-                .image(dao.getImage())
-                .stackType(dao.getStackType())
-                .proficiency(dao.getProficiency())
-                .build()
-        );
-    }
-
     public Page<Stack> findStacks(Pageable pageable, String type) {
         Page<Stack> stacks;
         if (type == null) { stacks = repository.findAll(pageable); }
         else { stacks = repository.findByStackType(pageable, type); }
 
         return stacks;
+    }
+
+    public Page<StackResponse> findStacksVo(Pageable pageable, String type) {
+        return findStacks(pageable, type)
+                .map(dao -> StackResponse.builder()
+                    .name(dao.getName())
+                    .image(dao.getImage())
+                    .stackType(dao.getStackType())
+                    .proficiency(dao.getProficiency())
+                    .build()
+                );
     }
 
     @Transactional

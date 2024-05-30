@@ -38,6 +38,7 @@ public class DesignService {
 
     public DesignResponse findDesignVo(Long id) {
         Design dao = findDesign(id);
+        if (!dao.getView()) { throw new EntityNotFoundException("Not found Design"); }
         return DesignResponse.builder()
                 .id(dao.getId())
                 .name(dao.getName())
@@ -65,14 +66,16 @@ public class DesignService {
     public Page<DesignsResponse> findDesignsVo(
             Pageable pageable, String name, String description
     ) {
-        return findDesigns(pageable, name, description).map(dao ->  DesignsResponse.builder()
-                .id(dao.getId())
-                .name(dao.getName())
-                .link(dao.getLink())
-                .description(dao.getDescription())
-                .image(dao.getImage())
-                .build()
-        );
+        return (Page<DesignsResponse>) findDesigns(pageable, name, description)
+                .filter(Design::getView)
+                .map(dao ->  DesignsResponse.builder()
+                        .id(dao.getId())
+                        .name(dao.getName())
+                        .link(dao.getLink())
+                        .description(dao.getDescription())
+                        .image(dao.getImage())
+                        .build()
+                );
     }
 
     @Transactional

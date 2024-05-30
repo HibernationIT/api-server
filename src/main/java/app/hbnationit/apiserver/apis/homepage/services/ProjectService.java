@@ -45,6 +45,7 @@ public class ProjectService {
                 .from(project)
                 .join(stack).on(project.stacks.contains(stack.name))
                 .where(project.id.eq(id))
+                .where(project.view.isTrue())
                 .transform(
                         groupBy(project.id).list(
                                 Projections.fields(ProjectResponse.class,
@@ -151,6 +152,8 @@ public class ProjectService {
     }
 
     private void setQuery(JPAQuery<?> query, String name, String stacks, String description) {
+        query.where(project.view.isTrue());
+
         if (name != null && description == null) {
             query.where(project.name.toUpperCase().contains(name.toUpperCase()));
         } else if (name == null && description != null) {

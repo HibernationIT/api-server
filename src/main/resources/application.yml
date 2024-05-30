@@ -31,5 +31,5 @@ spring:
 
   mail:
     host: smtp.email.ap-chuncheon-1.oci.oraclecloud.com
-    username: ${GMAIL_USERNAME}
-    password: ${GMAIL_PASSWORD}
+    username: ${OCI_SMTP_USERNAME}
+    password: ${OCI_SMTP_PASSWORD}

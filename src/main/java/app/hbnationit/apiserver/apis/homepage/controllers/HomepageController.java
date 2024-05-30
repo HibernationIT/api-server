@@ -1,10 +1,7 @@
 package app.hbnationit.apiserver.apis.homepage.controllers;
 
 import app.hbnationit.apiserver.apis.homepage.models.vo.ProjectsResponse;
-import app.hbnationit.apiserver.apis.homepage.services.BlogService;
-import app.hbnationit.apiserver.apis.homepage.services.DesignService;
-import app.hbnationit.apiserver.apis.homepage.services.ProjectService;
-import app.hbnationit.apiserver.apis.homepage.services.StackService;
+import app.hbnationit.apiserver.apis.homepage.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +17,7 @@ public class HomepageController {
     private final ProjectService projectService;
     private final BlogService blogService;
     private final DesignService designService;
+    private final IconService iconService;
 
     /*
     ========================================
@@ -47,7 +45,6 @@ public class HomepageController {
                 .status(HttpStatus.OK)
                 .body(projectService.findProjectVo(id));
     }
-
     @GetMapping("/projects")
     public ResponseEntity<Page<ProjectsResponse>> projectList(
             Pageable pageable,
@@ -71,7 +68,6 @@ public class HomepageController {
                 .status(HttpStatus.OK)
                 .body(blogService.findBlogVo(id));
     }
-
     @GetMapping("/blogs")
     public ResponseEntity<?> blogList(
             Pageable pageable,
@@ -89,14 +85,13 @@ public class HomepageController {
     Designs
     ========================================
     */
-    @GetMapping("/design/{id}")
+    @GetMapping("/designs/{id}")
     public ResponseEntity<?> designDetails(@PathVariable(name = "id") Long id) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(designService.findDesignVo(id));
     }
-
-    @GetMapping("/design")
+    @GetMapping("/designs")
     public ResponseEntity<?> designList(
             Pageable pageable,
             @RequestParam(required = false) String name,
@@ -105,5 +100,20 @@ public class HomepageController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(designService.findDesignsVo(pageable, name, description));
+    }
+
+    /*
+    ========================================
+    Icons
+    ========================================
+    */
+    @GetMapping("/icons")
+    public ResponseEntity<?> iconsList(
+            Pageable pageable,
+            @RequestParam(required = false) String name
+    ) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(iconService.findIconsVo(pageable, name));
     }
 }
