@@ -23,17 +23,21 @@ public class IconService {
     public Page<Icon> findIcons(Pageable pageable, String name) {
         Page<Icon> icons;
         if (name == null) { icons = repository.findAll(pageable); }
-        else { icons = repository.findByNameLike(name); }
+        else { icons = repository.findByNameLike(pageable, name); }
 
         return icons;
     }
 
     public Page<IconResponse> findIconsVo(Pageable pageable, String name) {
-        return (Page<IconResponse>) findIcons(pageable, name)
-                .filter(Icon::getView)
+        Page<Icon> icons;
+        if (name == null) { icons = repository.findByViewIsTrue(pageable); }
+        else { icons = repository.findByViewIsTrueAndNameLike(pageable, name); }
+
+        return icons
                 .map(dao -> IconResponse.builder()
                         .name(dao.getName())
                         .svg(dao.getSvg())
+                        .createdAt(dao.getCreatedAt())
                         .build()
                 );
     }

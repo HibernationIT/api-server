@@ -1,5 +1,6 @@
 package app.hbnationit.apiserver.apis.homepage.models;
 
+import app.hbnationit.apiserver.global.models.DefaultEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -12,7 +13,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "homepage_icons")
 @NoArgsConstructor
-public @Getter @Setter class Icon {
+public @Getter @Setter class Icon extends DefaultEntity {
     @Id
     private @Column(name = "name") String name;
     private @Column(name = "svg") String svg;
@@ -31,6 +32,10 @@ public @Getter @Setter class Icon {
                 "name='" + name + '\'' +
                 ", svg='" + svg + '\'' +
                 ", view=" + view +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
                 '}';
     }
 }

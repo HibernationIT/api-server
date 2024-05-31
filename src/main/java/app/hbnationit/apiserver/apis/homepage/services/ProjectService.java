@@ -87,9 +87,9 @@ public class ProjectService {
     public Page<ProjectsResponse> findProjectsVo(
             Pageable pageable, String name, String stacks, String description
     ) {
-        JPAQuery<?> countQuery = queryFactory.select(project.count()).from(project);
+        JPAQuery<?> countQuery = queryFactory.select(project.count()).from(project).where(project.view.isTrue());
         JPAQuery<?> contentsQuery = queryFactory
-                .from(project)
+                .from(project).where(project.view.isTrue())
                 .join(stack).on(project.stacks.contains(stack.name));
         setQuery(countQuery, name, stacks, description);
         setQuery(contentsQuery, name, stacks, description);
@@ -152,8 +152,6 @@ public class ProjectService {
     }
 
     private void setQuery(JPAQuery<?> query, String name, String stacks, String description) {
-        query.where(project.view.isTrue());
-
         if (name != null && description == null) {
             query.where(project.name.toUpperCase().contains(name.toUpperCase()));
         } else if (name == null && description != null) {

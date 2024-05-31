@@ -76,8 +76,10 @@ public class SecurityFilter extends OncePerRequestFilter {
             sb.append("Invalid signature token.");
         } else if (clazz.equals(IllegalArgumentException.class)) {
             sb.append("Invalid argument token.");
+        } else if (clazz.equals(AuthorizationServiceException.class)) {
+            sb.append("Not supported Authorization.");
         } else {
-            sb.append("Invalid authentication.");
+            return;
         }
         logger.info(sb.toString());
     }

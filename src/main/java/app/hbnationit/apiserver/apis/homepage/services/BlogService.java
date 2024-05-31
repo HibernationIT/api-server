@@ -67,8 +67,15 @@ public class BlogService {
     public Page<BlogsResponse> findBlogsVo(
             Pageable pageable, String name, String tags, String description
     ) {
-        return (Page<BlogsResponse>) findBlogs(pageable, name, tags, description)
-                .filter(Blog::getView)
+        JPAQuery<Long> countQuery = queryFactory.select(blog.count()).from(blog).where(blog.view.isTrue());
+        JPAQuery<Blog> contentQuery = queryFactory.selectFrom(blog).where(blog.view.isTrue());
+        setQuery(countQuery, name, tags, description);
+        setQuery(contentQuery, name, tags, description);
+
+        List<Blog> contents = contentQuery.fetch();
+        Long count = countQuery.fetchOne();
+
+        return new PageImpl<>(contents, pageable, count)
                 .map(dao -> BlogsResponse.builder()
                     .id(dao.getId())
                     .name(dao.getName())
@@ -76,8 +83,8 @@ public class BlogService {
                     .tags(new HashSet<>(Arrays.asList(dao.getTags().split(","))))
                     .image(dao.getImage())
                     .createdAt(dao.getCreatedAt())
-                    .build())
-                ;
+                    .build()
+                );
     }
 
     @Transactional

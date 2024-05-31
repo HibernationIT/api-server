@@ -4,15 +4,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @NoArgsConstructor
 public @Getter class IconResponse {
     private String name;
     private String svg;
+    private LocalDateTime createdAt;
 
     @Builder
-    public IconResponse(String name, String svg) {
+    public IconResponse(String name, String svg, LocalDateTime createdAt) {
         this.name = name;
         this.svg = svg;
+        this.createdAt = createdAt;
     }
 
     @Override
@@ -20,6 +24,7 @@ public @Getter class IconResponse {
         return "IconResponse{" +
                 "name='" + name + '\'' +
                 ", svg='" + svg + '\'' +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }

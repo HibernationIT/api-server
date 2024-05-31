@@ -46,6 +46,7 @@ public class DesignService {
                 .description(dao.getDescription())
                 .image(dao.getImage())
                 .designs(new HashSet<>(Arrays.asList(dao.getDesigns().split(","))))
+                .createdAt(dao.getCreatedAt())
                 .build();
     }
 
@@ -66,14 +67,22 @@ public class DesignService {
     public Page<DesignsResponse> findDesignsVo(
             Pageable pageable, String name, String description
     ) {
-        return (Page<DesignsResponse>) findDesigns(pageable, name, description)
-                .filter(Design::getView)
+        JPAQuery<Long> countQuery = queryFactory.select(design.count()).from(design).where(design.view.isTrue());
+        JPAQuery<Design> contentQuery = queryFactory.selectFrom(design).where(design.view.isTrue());
+        setQuery(countQuery, name, description);
+        setQuery(contentQuery, name, description);
+
+        List<Design> contents = contentQuery.fetch();
+        Long count = countQuery.fetchOne();
+
+        return new PageImpl<>(contents, pageable, count)
                 .map(dao ->  DesignsResponse.builder()
                         .id(dao.getId())
                         .name(dao.getName())
                         .link(dao.getLink())
                         .description(dao.getDescription())
                         .image(dao.getImage())
+                        .createdAt(dao.getCreatedAt())
                         .build()
                 );
     }
