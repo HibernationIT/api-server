@@ -41,4 +41,5 @@ jobs:
           context: .
           file: ./Dockerfile
           platforms: linux/arm64
+          push: true
           tags: ${{ secrets.OCI_REGISTRY_URL }}/${{ env.app-name }}:${{ github.sha }}
