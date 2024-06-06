@@ -1,4 +1,4 @@
-name: Deploy my Server
+name: Build my Server
 on:
   push:
     branches: [main]
@@ -27,3 +27,25 @@ jobs:
 
       - name: Build
         run: mvn -B package -DskipTests=true --file pom.xml
+
+      - name: Config Docker
+        uses: docker/login-action@3
+        with:
+          registry: yny.ocir.io
+          username: ${{ secrets.OCI_REGISTRY_USERNAME }}
+          password: ${{ secrets.OCI_REGISTRY_PASSWORD }}
+
+      - name: Docker build & push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/arm64
+          tags: ${{ secrets.OCI_REGISTRY_URL }}/${{ env.app-name }}:${{ github.sha }}
+
+  deploy:
+    needs: build
+    uses: HibernationIT/k3s/.github/workflows/deploy.yml@master
+    with:
+      app-name: ${{ needs.build.outputs.app-name }}
+      tag: ${{ github.sha }}
