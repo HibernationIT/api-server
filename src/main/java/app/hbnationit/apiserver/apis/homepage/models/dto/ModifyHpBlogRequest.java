@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import java.util.Set;
 
-public @Getter @Setter class AddBlogRequest {
+public @Getter @Setter class ModifyHpBlogRequest {
     private String name;
     private String description;
     private Set<String> tags;
@@ -15,7 +15,7 @@ public @Getter @Setter class AddBlogRequest {
     private String content;
 
     @Builder
-    public AddBlogRequest(String name, String description, Set<String> tags, Boolean view, String image, String content) {
+    public ModifyHpBlogRequest(String name, String description, Set<String> tags, Boolean view, String image, String content) {
         this.name = name;
         this.description = description;
         this.tags = tags;

@@ -1,10 +1,10 @@
 package app.hbnationit.apiserver.apis.homepage.services;
 
-import app.hbnationit.apiserver.apis.homepage.models.Project;
-import app.hbnationit.apiserver.apis.homepage.models.dto.AddProjectRequest;
-import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyProjectRequest;
-import app.hbnationit.apiserver.apis.homepage.models.vo.ProjectResponse;
-import app.hbnationit.apiserver.apis.homepage.models.vo.ProjectsResponse;
+import app.hbnationit.apiserver.apis.homepage.models.HpProject;
+import app.hbnationit.apiserver.apis.homepage.models.dto.AddHpProjectRequest;
+import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyHpProjectRequest;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpProjectResponse;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpProjectsResponse;
 import app.hbnationit.apiserver.apis.homepage.repositories.ProjectRepository;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
@@ -15,8 +15,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,96 +33,25 @@ public class ProjectService {
         this.queryFactory = queryFactory;
     }
 
-    public ResponseEntity<ProjectResponse> findProject(Long id) {
-        ProjectResponse vo = getOne(id);
-        return ResponseEntity.status(HttpStatus.CREATED).body(vo);
-    }
-
-    public ResponseEntity<Page<ProjectsResponse>> findProjects(
-            Pageable pageable, String name, String stacks, String description
-    ) {
-        JPAQuery<?> countQuery = queryFactory.select(project.count()).from(project);
-        JPAQuery<?> contentsQuery = queryFactory
-                .from(project)
-                .join(stack).on(project.stacks.contains(stack.name));
-        setQuery(countQuery, name, stacks, description);
-        setQuery(contentsQuery, name, stacks, description);
-
-        List<ProjectsResponse> contents = contentsQuery.transform(
-                groupBy(project.id).list(
-                        Projections.fields(ProjectsResponse.class,
-                                project.id,
-                                project.name,
-                                project.link,
-                                project.description,
-                                GroupBy.set(Projections.fields(ProjectsResponse.Stack.class,
-                                        stack.name,
-                                        stack.image
-                                )).as("stacks"),
-                                project.image,
-                                project.createdAt
-                        )
-                )
-        );
-        Long count = (Long) countQuery.fetchOne();
-
-        Page<ProjectsResponse> vo = new PageImpl<>(contents, pageable, count);
-        return ResponseEntity.status(HttpStatus.OK).body(vo);
-    }
-
-    @Transactional
-    public ResponseEntity<ProjectResponse> addProject(AddProjectRequest dto) {
-        String stacks = String.join(",", dto.getStacks());
-
-        Project dao = Project.builder()
-                .name(dto.getName())
-                .link(dto.getLink())
-                .description(dto.getDescription())
-                .stacks(stacks)
-                .view(dto.getView())
-                .image(dto.getImage())
-                .content(dto.getContent())
-                .build();
-        dao = repository.save(dao);
-;
-        return ResponseEntity.status(HttpStatus.CREATED).body(getOne(dao.getId()));
-    }
-
-    @Transactional
-    public ResponseEntity<ProjectResponse> modifyProject(Long id, ModifyProjectRequest dto) {
-        Project dao = repository.findById(id).orElseThrow(() ->
+    public HpProject findProject(Long id) {
+        return repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found Project"));
-        String stacks = String.join(",", dto.getStacks());
-        dao.setName(dto.getName());
-        dao.setLink(dto.getLink());
-        dao.setDescription(dto.getDescription());
-        dao.setStacks(stacks);
-        dao.setView(dto.getView());
-        dao.setImage(dto.getImage());
-        dao.setContent(dto.getContent());
-
-        return ResponseEntity.status(HttpStatus.OK).body(getOne(dao.getId()));
     }
 
-    @Transactional
-    public ResponseEntity<?> removeProject(Long id) {
-        repository.deleteById(id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    private ProjectResponse getOne(Long id) {
-        List<ProjectResponse> vo = queryFactory
+    public HpProjectResponse findProjectVo(Long id) {
+        List<HpProjectResponse> vo = queryFactory
                 .from(project)
                 .join(stack).on(project.stacks.contains(stack.name))
                 .where(project.id.eq(id))
+                .where(project.view.isTrue())
                 .transform(
                         groupBy(project.id).list(
-                                Projections.fields(ProjectResponse.class,
+                                Projections.fields(HpProjectResponse.class,
                                         project.id,
                                         project.name,
                                         project.link,
                                         project.description,
-                                        GroupBy.set(Projections.fields(ProjectResponse.Stack.class,
+                                        GroupBy.set(Projections.fields(HpProjectResponse.Stack.class,
                                                 stack.name,
                                                 stack.image
                                         )).as("stacks"),
@@ -139,6 +66,87 @@ public class ProjectService {
         }
 
         return vo.get(0);
+    }
+
+    public Page<HpProject> findProjects(
+            Pageable pageable, String name, String stacks, String description
+    ) {
+        JPAQuery<Long> countQuery = queryFactory.select(project.count()).from(project);
+        JPAQuery<HpProject> contentsQuery = queryFactory.selectFrom(project);
+        setQuery(countQuery, name, stacks, description);
+        setQuery(contentsQuery, name, stacks, description);
+
+        List<HpProject> contents = contentsQuery.fetch();
+        Long count = countQuery.fetchOne();
+
+        return new PageImpl<>(contents, pageable, count);
+    }
+
+    public Page<HpProjectsResponse> findProjectsVo(
+            Pageable pageable, String name, String stacks, String description
+    ) {
+        JPAQuery<?> countQuery = queryFactory.select(project.count()).from(project).where(project.view.isTrue());
+        JPAQuery<?> contentsQuery = queryFactory
+                .from(project).where(project.view.isTrue())
+                .join(stack).on(project.stacks.contains(stack.name));
+        setQuery(countQuery, name, stacks, description);
+        setQuery(contentsQuery, name, stacks, description);
+
+        List<HpProjectsResponse> contents = contentsQuery.transform(
+                groupBy(project.id).list(
+                        Projections.fields(HpProjectsResponse.class,
+                                project.id,
+                                project.name,
+                                project.link,
+                                project.description,
+                                GroupBy.set(Projections.fields(HpProjectsResponse.Stack.class,
+                                        stack.name,
+                                        stack.image
+                                )).as("stacks"),
+                                project.image,
+                                project.createdAt
+                        )
+                )
+        );
+        Long count = (Long) countQuery.fetchOne();
+
+        return new PageImpl<>(contents, pageable, count);
+    }
+
+    @Transactional
+    public HpProject addProject(AddHpProjectRequest dto) {
+        String stacks = String.join(",", dto.getStacks());
+
+        HpProject dao = HpProject.builder()
+                .name(dto.getName())
+                .link(dto.getLink())
+                .description(dto.getDescription())
+                .stacks(stacks)
+                .view(dto.getView())
+                .image(dto.getImage())
+                .content(dto.getContent())
+                .build();
+        return repository.save(dao);
+    }
+
+    @Transactional
+    public HpProject modifyProject(Long id, ModifyHpProjectRequest dto) {
+        HpProject dao = repository.findById(id).orElseThrow(() ->
+                new EntityNotFoundException("Not found Project"));
+        String stacks = String.join(",", dto.getStacks());
+        dao.setName(dto.getName());
+        dao.setLink(dto.getLink());
+        dao.setDescription(dto.getDescription());
+        dao.setStacks(stacks);
+        dao.setView(dto.getView());
+        dao.setImage(dto.getImage());
+        dao.setContent(dto.getContent());
+        return dao;
+    }
+
+    @Transactional
+    public void removeProject(Long id) {
+        repository.deleteById(id);
     }
 
     private void setQuery(JPAQuery<?> query, String name, String stacks, String description) {

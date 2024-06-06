@@ -11,30 +11,27 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "homepage_stacks")
+@Table(name = "homepage_icons")
 @NoArgsConstructor
-public @Getter @Setter class Stack extends DefaultEntity {
+public @Getter @Setter class HpIcon extends DefaultEntity {
     @Id
     private @Column(name = "name") String name;
-    private @Column(name = "image") String image;
-    private @Column(name = "stack_type") String stackType;
-    private @Column(name = "proficiency") Integer proficiency;
+    private @Column(name = "svg") String svg;
+    private @Column(name = "view") Boolean view;
 
     @Builder
-    public Stack(String name, String image, String stackType, Integer proficiency) {
+    public HpIcon(String name, String svg, Boolean view) {
         this.name = name;
-        this.image = image;
-        this.stackType = stackType;
-        this.proficiency = proficiency;
+        this.svg = svg;
+        this.view = view;
     }
 
     @Override
     public String toString() {
-        return "Stack{" +
+        return "Icon{" +
                 "name='" + name + '\'' +
-                ", image='" + image + '\'' +
-                ", stackType='" + stackType + '\'' +
-                ", proficiency=" + proficiency +
+                ", svg='" + svg + '\'' +
+                ", view=" + view +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", createdBy='" + createdBy + '\'' +

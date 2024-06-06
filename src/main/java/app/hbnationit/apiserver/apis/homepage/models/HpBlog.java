@@ -8,26 +8,25 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "homepage_projects")
+@Table(name = "homepage_blogs")
 @NoArgsConstructor
-public @Getter @Setter class Project extends DefaultEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+public @Getter @Setter class HpBlog extends DefaultEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private @Column(name = "id") Long id;
     private @Column(name = "name") String name;
-    private @Column(name = "link") String link;
     private @Column(name = "description") String description;
-    private @Column(name = "stacks") String stacks;
+    private @Column(name = "tags") String tags;
     private @Column(name = "view") Boolean view;
     private @Column(name = "image") String image;
     private @Column(name = "content", length = 1024*32) String content;
 
     @Builder
-    public Project(Long id, String name, String link, String description, String stacks, Boolean view, String image, String content) {
+    public HpBlog(Long id, String name, String description, String tags, Boolean view, String image, String content) {
         this.id = id;
         this.name = name;
-        this.link = link;
         this.description = description;
-        this.stacks = stacks;
+        this.tags = tags;
         this.view = view;
         this.image = image;
         this.content = content;
@@ -35,18 +34,18 @@ public @Getter @Setter class Project extends DefaultEntity {
 
     @Override
     public String toString() {
-        return "Project{" +
+        return "Blog{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", link='" + link + '\'' +
                 ", description='" + description + '\'' +
-                ", stacks=" + stacks +
+                ", tags='" + tags + '\'' +
                 ", view=" + view +
                 ", image='" + image + '\'' +
+                ", content='" + content + '\'' +
                 ", createdAt=" + createdAt +
-                ", createdBy=" + createdBy +
                 ", updatedAt=" + updatedAt +
-                ", updatedBy=" + updatedBy +
+                ", createdBy='" + createdBy + '\'' +
+                ", updatedBy='" + updatedBy + '\'' +
                 '}';
     }
 }
