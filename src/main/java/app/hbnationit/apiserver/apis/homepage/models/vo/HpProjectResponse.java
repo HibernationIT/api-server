@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @NoArgsConstructor
-public @Getter class ProjectResponse {
+public @Getter class HpProjectResponse {
     private Long id;
     private String name;
     private String link;
@@ -39,7 +39,7 @@ public @Getter class ProjectResponse {
     }
 
     @Builder
-    public ProjectResponse(Long id, String name, String link, String description, Set<Stack> stacks, String image, String content, LocalDateTime createdAt) {
+    public HpProjectResponse(Long id, String name, String link, String description, Set<Stack> stacks, String image, String content, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.link = link;

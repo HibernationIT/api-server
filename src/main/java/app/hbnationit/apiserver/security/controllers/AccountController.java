@@ -25,7 +25,7 @@ public class AccountController {
     }
 
     @GetMapping("/{email}")
-    public ResponseEntity<?> accountDetail(@PathVariable(name = "email") String email) {
+    public ResponseEntity<?> accountDetails(@PathVariable(name = "email") String email) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(service.findAccount(email));

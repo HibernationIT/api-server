@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor
-public @Getter class IconResponse {
+public @Getter class HpIconResponse {
     private String name;
     private String svg;
     private LocalDateTime createdAt;
 
     @Builder
-    public IconResponse(String name, String svg, LocalDateTime createdAt) {
+    public HpIconResponse(String name, String svg, LocalDateTime createdAt) {
         this.name = name;
         this.svg = svg;
         this.createdAt = createdAt;

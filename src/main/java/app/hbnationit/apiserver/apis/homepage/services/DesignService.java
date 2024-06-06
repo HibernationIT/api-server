@@ -1,10 +1,10 @@
 package app.hbnationit.apiserver.apis.homepage.services;
 
-import app.hbnationit.apiserver.apis.homepage.models.Design;
-import app.hbnationit.apiserver.apis.homepage.models.dto.AddDesignRequest;
-import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyDesignRequest;
-import app.hbnationit.apiserver.apis.homepage.models.vo.DesignResponse;
-import app.hbnationit.apiserver.apis.homepage.models.vo.DesignsResponse;
+import app.hbnationit.apiserver.apis.homepage.models.HpDesign;
+import app.hbnationit.apiserver.apis.homepage.models.dto.AddHpDesignRequest;
+import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyHpDesignRequest;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpDesignResponse;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpDesignsResponse;
 import app.hbnationit.apiserver.apis.homepage.repositories.DesignRepository;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -31,15 +31,15 @@ public class DesignService {
         this.queryFactory = queryFactory;
     }
 
-    public Design findDesign(Long id) {
+    public HpDesign findDesign(Long id) {
         return repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found Design"));
     }
 
-    public DesignResponse findDesignVo(Long id) {
-        Design dao = findDesign(id);
+    public HpDesignResponse findDesignVo(Long id) {
+        HpDesign dao = findDesign(id);
         if (!dao.getView()) { throw new EntityNotFoundException("Not found Design"); }
-        return DesignResponse.builder()
+        return HpDesignResponse.builder()
                 .id(dao.getId())
                 .name(dao.getName())
                 .link(dao.getLink())
@@ -50,33 +50,33 @@ public class DesignService {
                 .build();
     }
 
-    public Page<Design> findDesigns(
+    public Page<HpDesign> findDesigns(
             Pageable pageable, String name, String description
     ) {
         JPAQuery<Long> countQuery = queryFactory.select(design.count()).from(design);
-        JPAQuery<Design> contentQuery = queryFactory.selectFrom(design);
+        JPAQuery<HpDesign> contentQuery = queryFactory.selectFrom(design);
         setQuery(countQuery, name, description);
         setQuery(contentQuery, name, description);
 
-        List<Design> contents = contentQuery.fetch();
+        List<HpDesign> contents = contentQuery.fetch();
         Long count = countQuery.fetchOne();
 
         return new PageImpl<>(contents, pageable, count);
     }
 
-    public Page<DesignsResponse> findDesignsVo(
+    public Page<HpDesignsResponse> findDesignsVo(
             Pageable pageable, String name, String description
     ) {
         JPAQuery<Long> countQuery = queryFactory.select(design.count()).from(design).where(design.view.isTrue());
-        JPAQuery<Design> contentQuery = queryFactory.selectFrom(design).where(design.view.isTrue());
+        JPAQuery<HpDesign> contentQuery = queryFactory.selectFrom(design).where(design.view.isTrue());
         setQuery(countQuery, name, description);
         setQuery(contentQuery, name, description);
 
-        List<Design> contents = contentQuery.fetch();
+        List<HpDesign> contents = contentQuery.fetch();
         Long count = countQuery.fetchOne();
 
         return new PageImpl<>(contents, pageable, count)
-                .map(dao ->  DesignsResponse.builder()
+                .map(dao ->  HpDesignsResponse.builder()
                         .id(dao.getId())
                         .name(dao.getName())
                         .link(dao.getLink())
@@ -88,10 +88,10 @@ public class DesignService {
     }
 
     @Transactional
-    public Design addDesign(AddDesignRequest dto) {
+    public HpDesign addDesign(AddHpDesignRequest dto) {
         String designs = String.join(",", dto.getDesigns());
 
-        Design dao = Design.builder()
+        HpDesign dao = HpDesign.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .link(dto.getLink())
@@ -103,8 +103,8 @@ public class DesignService {
     }
 
     @Transactional
-    public Design modifyDesign(Long id, ModifyDesignRequest dto) {
-        Design dao = repository.findById(id).orElseThrow(() ->
+    public HpDesign modifyDesign(Long id, ModifyHpDesignRequest dto) {
+        HpDesign dao = repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found Blog"));
         String designs = String.join(",", dto.getDesigns());
         dao.setName(dto.getName());

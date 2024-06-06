@@ -1,6 +1,6 @@
 package app.hbnationit.apiserver.apis.homepage.controllers;
 
-import app.hbnationit.apiserver.apis.homepage.models.vo.ProjectsResponse;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpProjectsResponse;
 import app.hbnationit.apiserver.apis.homepage.services.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -46,7 +46,7 @@ public class HomepageController {
                 .body(projectService.findProjectVo(id));
     }
     @GetMapping("/projects")
-    public ResponseEntity<Page<ProjectsResponse>> projectList(
+    public ResponseEntity<Page<HpProjectsResponse>> projectList(
             Pageable pageable,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String stacks,

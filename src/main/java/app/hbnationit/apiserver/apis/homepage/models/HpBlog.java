@@ -10,7 +10,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "homepage_blogs")
 @NoArgsConstructor
-public @Getter @Setter class Blog extends DefaultEntity {
+public @Getter @Setter class HpBlog extends DefaultEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private @Column(name = "id") Long id;
@@ -22,7 +22,7 @@ public @Getter @Setter class Blog extends DefaultEntity {
     private @Column(name = "content", length = 1024*32) String content;
 
     @Builder
-    public Blog(Long id, String name, String description, String tags, Boolean view, String image, String content) {
+    public HpBlog(Long id, String name, String description, String tags, Boolean view, String image, String content) {
         this.id = id;
         this.name = name;
         this.description = description;

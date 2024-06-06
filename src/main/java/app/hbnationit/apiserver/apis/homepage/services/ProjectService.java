@@ -1,10 +1,10 @@
 package app.hbnationit.apiserver.apis.homepage.services;
 
-import app.hbnationit.apiserver.apis.homepage.models.Project;
-import app.hbnationit.apiserver.apis.homepage.models.dto.AddProjectRequest;
-import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyProjectRequest;
-import app.hbnationit.apiserver.apis.homepage.models.vo.ProjectResponse;
-import app.hbnationit.apiserver.apis.homepage.models.vo.ProjectsResponse;
+import app.hbnationit.apiserver.apis.homepage.models.HpProject;
+import app.hbnationit.apiserver.apis.homepage.models.dto.AddHpProjectRequest;
+import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyHpProjectRequest;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpProjectResponse;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpProjectsResponse;
 import app.hbnationit.apiserver.apis.homepage.repositories.ProjectRepository;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
@@ -15,8 +15,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,25 +33,25 @@ public class ProjectService {
         this.queryFactory = queryFactory;
     }
 
-    public Project findProject(Long id) {
+    public HpProject findProject(Long id) {
         return repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found Project"));
     }
 
-    public ProjectResponse findProjectVo(Long id) {
-        List<ProjectResponse> vo = queryFactory
+    public HpProjectResponse findProjectVo(Long id) {
+        List<HpProjectResponse> vo = queryFactory
                 .from(project)
                 .join(stack).on(project.stacks.contains(stack.name))
                 .where(project.id.eq(id))
                 .where(project.view.isTrue())
                 .transform(
                         groupBy(project.id).list(
-                                Projections.fields(ProjectResponse.class,
+                                Projections.fields(HpProjectResponse.class,
                                         project.id,
                                         project.name,
                                         project.link,
                                         project.description,
-                                        GroupBy.set(Projections.fields(ProjectResponse.Stack.class,
+                                        GroupBy.set(Projections.fields(HpProjectResponse.Stack.class,
                                                 stack.name,
                                                 stack.image
                                         )).as("stacks"),
@@ -70,21 +68,21 @@ public class ProjectService {
         return vo.get(0);
     }
 
-    public Page<Project> findProjects(
+    public Page<HpProject> findProjects(
             Pageable pageable, String name, String stacks, String description
     ) {
         JPAQuery<Long> countQuery = queryFactory.select(project.count()).from(project);
-        JPAQuery<Project> contentsQuery = queryFactory.selectFrom(project);
+        JPAQuery<HpProject> contentsQuery = queryFactory.selectFrom(project);
         setQuery(countQuery, name, stacks, description);
         setQuery(contentsQuery, name, stacks, description);
 
-        List<Project> contents = contentsQuery.fetch();
+        List<HpProject> contents = contentsQuery.fetch();
         Long count = countQuery.fetchOne();
 
         return new PageImpl<>(contents, pageable, count);
     }
 
-    public Page<ProjectsResponse> findProjectsVo(
+    public Page<HpProjectsResponse> findProjectsVo(
             Pageable pageable, String name, String stacks, String description
     ) {
         JPAQuery<?> countQuery = queryFactory.select(project.count()).from(project).where(project.view.isTrue());
@@ -94,14 +92,14 @@ public class ProjectService {
         setQuery(countQuery, name, stacks, description);
         setQuery(contentsQuery, name, stacks, description);
 
-        List<ProjectsResponse> contents = contentsQuery.transform(
+        List<HpProjectsResponse> contents = contentsQuery.transform(
                 groupBy(project.id).list(
-                        Projections.fields(ProjectsResponse.class,
+                        Projections.fields(HpProjectsResponse.class,
                                 project.id,
                                 project.name,
                                 project.link,
                                 project.description,
-                                GroupBy.set(Projections.fields(ProjectsResponse.Stack.class,
+                                GroupBy.set(Projections.fields(HpProjectsResponse.Stack.class,
                                         stack.name,
                                         stack.image
                                 )).as("stacks"),
@@ -116,10 +114,10 @@ public class ProjectService {
     }
 
     @Transactional
-    public Project addProject(AddProjectRequest dto) {
+    public HpProject addProject(AddHpProjectRequest dto) {
         String stacks = String.join(",", dto.getStacks());
 
-        Project dao = Project.builder()
+        HpProject dao = HpProject.builder()
                 .name(dto.getName())
                 .link(dto.getLink())
                 .description(dto.getDescription())
@@ -132,8 +130,8 @@ public class ProjectService {
     }
 
     @Transactional
-    public Project modifyProject(Long id, ModifyProjectRequest dto) {
-        Project dao = repository.findById(id).orElseThrow(() ->
+    public HpProject modifyProject(Long id, ModifyHpProjectRequest dto) {
+        HpProject dao = repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found Project"));
         String stacks = String.join(",", dto.getStacks());
         dao.setName(dto.getName());

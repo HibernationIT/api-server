@@ -1,9 +1,9 @@
 package app.hbnationit.apiserver.apis.homepage.services;
 
-import app.hbnationit.apiserver.apis.homepage.models.Icon;
-import app.hbnationit.apiserver.apis.homepage.models.dto.AddIconRequest;
-import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyIconRequest;
-import app.hbnationit.apiserver.apis.homepage.models.vo.IconResponse;
+import app.hbnationit.apiserver.apis.homepage.models.HpIcon;
+import app.hbnationit.apiserver.apis.homepage.models.dto.AddHpIconRequest;
+import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyHpIconRequest;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpIconResponse;
 import app.hbnationit.apiserver.apis.homepage.repositories.IconRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,21 +20,21 @@ public class IconService {
         this.repository = repository;
     }
 
-    public Page<Icon> findIcons(Pageable pageable, String name) {
-        Page<Icon> icons;
+    public Page<HpIcon> findIcons(Pageable pageable, String name) {
+        Page<HpIcon> icons;
         if (name == null) { icons = repository.findAll(pageable); }
         else { icons = repository.findByNameLike(pageable, name); }
 
         return icons;
     }
 
-    public Page<IconResponse> findIconsVo(Pageable pageable, String name) {
-        Page<Icon> icons;
+    public Page<HpIconResponse> findIconsVo(Pageable pageable, String name) {
+        Page<HpIcon> icons;
         if (name == null) { icons = repository.findByViewIsTrue(pageable); }
         else { icons = repository.findByViewIsTrueAndNameLike(pageable, name); }
 
         return icons
-                .map(dao -> IconResponse.builder()
+                .map(dao -> HpIconResponse.builder()
                         .name(dao.getName())
                         .svg(dao.getSvg())
                         .createdAt(dao.getCreatedAt())
@@ -43,12 +43,12 @@ public class IconService {
     }
 
     @Transactional
-    public Icon addIcon(AddIconRequest dto) {
+    public HpIcon addIcon(AddHpIconRequest dto) {
         if (repository.findById(dto.getName()).isPresent()) {
             throw new EntityExistsException("Icon is already exist");
         }
 
-        Icon dao = Icon.builder()
+        HpIcon dao = HpIcon.builder()
                 .name(dto.getName())
                 .svg(dto.getSvg())
                 .view(dto.getView())
@@ -57,8 +57,8 @@ public class IconService {
     }
 
     @Transactional
-    public Icon modifyIcon(String name, ModifyIconRequest dto) {
-        Icon dao = repository.findById(name).orElseThrow(() ->
+    public HpIcon modifyIcon(String name, ModifyHpIconRequest dto) {
+        HpIcon dao = repository.findById(name).orElseThrow(() ->
                 new EntityNotFoundException("Not found Icon"));
         dao.setName(dto.getName());
         dao.setSvg(dto.getSvg());

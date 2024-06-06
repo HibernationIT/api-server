@@ -8,33 +8,36 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @NoArgsConstructor
-public @Getter class BlogsResponse {
+public @Getter class HpBlogResponse {
     private Long id;
     private String name;
     private String description;
     private Set<String> tags;
     private String image;
+    private String content;
     private LocalDateTime createdAt;
 
     @Builder
-    public BlogsResponse(Long id, String name, String description, Set<String> tags, String image, LocalDateTime createdAt) {
+    public HpBlogResponse(Long id, String name, String description, Set<String> tags, String image, String content, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.tags = tags;
         this.image = image;
+        this.content = content;
         this.createdAt = createdAt;
     }
 
     @Override
     public String toString() {
-        return "BlogsResponse{" +
+        return "BlogResponse{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", tags=" + tags +
                 ", image='" + image + '\'' +
-                ", createdAt=" + createdAt +
+                ", content='" + content + '\'' +
+                ", createdAt='" + createdAt + '\'' +
                 '}';
     }
 }

@@ -6,21 +6,21 @@ import lombok.Setter;
 
 import java.util.Set;
 
-public @Getter @Setter class ModifyBlogRequest {
+public @Getter @Setter class ModifyHpDesignRequest {
     private String name;
     private String description;
-    private Set<String> tags;
+    private String link;
     private Boolean view;
     private String image;
-    private String content;
+    private Set<String> designs;
 
     @Builder
-    public ModifyBlogRequest(String name, String description, Set<String> tags, Boolean view, String image, String content) {
+    public ModifyHpDesignRequest(String name, String description, String link, Boolean view, String image, Set<String> designs) {
         this.name = name;
         this.description = description;
-        this.tags = tags;
+        this.link = link;
         this.view = view;
         this.image = image;
-        this.content = content;
+        this.designs = designs;
     }
 }

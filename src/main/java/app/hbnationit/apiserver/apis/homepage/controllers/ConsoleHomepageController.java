@@ -33,7 +33,7 @@ public class ConsoleHomepageController {
                 .body(stackService.findStacks(pageable, type));
     }
     @PostMapping("/stacks")
-    public ResponseEntity<?> stackAdd(@RequestBody AddStackRequest body) {
+    public ResponseEntity<?> stackAdd(@RequestBody AddHpStackRequest body) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(stackService.addStack(body));
@@ -41,7 +41,7 @@ public class ConsoleHomepageController {
     @PutMapping("/stacks/{name}")
     public ResponseEntity<?> stackModify(
             @PathVariable(name = "name") String name,
-            @RequestBody ModifyStackRequest body
+            @RequestBody ModifyHpStackRequest body
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -78,7 +78,7 @@ public class ConsoleHomepageController {
                 .body(projectService.findProjects(pageable, name, stacks, description));
     }
     @PostMapping("/projects")
-    public ResponseEntity<?> projectAdd(@RequestBody AddProjectRequest body) {
+    public ResponseEntity<?> projectAdd(@RequestBody AddHpProjectRequest body) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(projectService.addProject(body));
@@ -86,7 +86,7 @@ public class ConsoleHomepageController {
     @PutMapping("/projects/{id}")
     public ResponseEntity<?> projectModify(
             @PathVariable(name = "id") Long id,
-            @RequestBody ModifyProjectRequest body
+            @RequestBody ModifyHpProjectRequest body
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -121,7 +121,7 @@ public class ConsoleHomepageController {
                 .body(blogService.findBlogs(pageable, name, tags, description));
     }
     @PostMapping("/blogs")
-    public ResponseEntity<?> blogAdd(@RequestBody AddBlogRequest body) {
+    public ResponseEntity<?> blogAdd(@RequestBody AddHpBlogRequest body) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(blogService.addBlog(body));
@@ -129,7 +129,7 @@ public class ConsoleHomepageController {
     @PutMapping("/blogs/{id}")
     public ResponseEntity<?> blogModify(
             @PathVariable(name = "id") Long id,
-            @RequestBody ModifyBlogRequest body
+            @RequestBody ModifyHpBlogRequest body
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -165,7 +165,7 @@ public class ConsoleHomepageController {
                 .body(designService.findDesigns(pageable, name, description));
     }
     @PostMapping("/designs")
-    public ResponseEntity<?> designAdd(@RequestBody AddDesignRequest body) {
+    public ResponseEntity<?> designAdd(@RequestBody AddHpDesignRequest body) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(designService.addDesign(body));
@@ -173,7 +173,7 @@ public class ConsoleHomepageController {
     @PutMapping("/designs/{id}")
     public ResponseEntity<?> designModify(
             @PathVariable(name = "id") Long id,
-            @RequestBody ModifyDesignRequest body
+            @RequestBody ModifyHpDesignRequest body
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -203,7 +203,7 @@ public class ConsoleHomepageController {
     }
 
     @PostMapping("/icons")
-    public ResponseEntity<?> iconAdd(@RequestBody AddIconRequest body) {
+    public ResponseEntity<?> iconAdd(@RequestBody AddHpIconRequest body) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(iconService.addIcon(body));
@@ -212,7 +212,7 @@ public class ConsoleHomepageController {
     @PutMapping("/icons/{name}")
     public ResponseEntity<?> iconModify(
             @PathVariable(name = "name") String name,
-            @RequestBody ModifyIconRequest body
+            @RequestBody ModifyHpIconRequest body
     ) {
         return ResponseEntity
                 .status(HttpStatus.OK)

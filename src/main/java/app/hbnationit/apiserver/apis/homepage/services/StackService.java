@@ -1,9 +1,9 @@
 package app.hbnationit.apiserver.apis.homepage.services;
 
-import app.hbnationit.apiserver.apis.homepage.models.Stack;
-import app.hbnationit.apiserver.apis.homepage.models.dto.AddStackRequest;
-import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyStackRequest;
-import app.hbnationit.apiserver.apis.homepage.models.vo.StackResponse;
+import app.hbnationit.apiserver.apis.homepage.models.HpStack;
+import app.hbnationit.apiserver.apis.homepage.models.dto.AddHpStackRequest;
+import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyHpStackRequest;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpStackResponse;
 import app.hbnationit.apiserver.apis.homepage.repositories.StackRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -20,17 +20,17 @@ public class StackService {
         this.repository = repository;
     }
 
-    public Page<Stack> findStacks(Pageable pageable, String type) {
-        Page<Stack> stacks;
+    public Page<HpStack> findStacks(Pageable pageable, String type) {
+        Page<HpStack> stacks;
         if (type == null) { stacks = repository.findAll(pageable); }
         else { stacks = repository.findByStackType(pageable, type); }
 
         return stacks;
     }
 
-    public Page<StackResponse> findStacksVo(Pageable pageable, String type) {
+    public Page<HpStackResponse> findStacksVo(Pageable pageable, String type) {
         return findStacks(pageable, type)
-                .map(dao -> StackResponse.builder()
+                .map(dao -> HpStackResponse.builder()
                     .name(dao.getName())
                     .image(dao.getImage())
                     .stackType(dao.getStackType())
@@ -40,12 +40,12 @@ public class StackService {
     }
 
     @Transactional
-    public Stack addStack(AddStackRequest dto) {
+    public HpStack addStack(AddHpStackRequest dto) {
         if (repository.findById(dto.getName()).isPresent()) {
             throw new EntityExistsException("Stack is already exist");
         }
 
-        Stack dao = Stack.builder()
+        HpStack dao = HpStack.builder()
                 .name(dto.getName())
                 .image(dto.getImage())
                 .stackType(dto.getStackType())
@@ -55,8 +55,8 @@ public class StackService {
     }
 
     @Transactional
-    public Stack modifyStack(String name, ModifyStackRequest dto) {
-        Stack dao = repository.findById(name).orElseThrow(() ->
+    public HpStack modifyStack(String name, ModifyHpStackRequest dto) {
+        HpStack dao = repository.findById(name).orElseThrow(() ->
                 new EntityNotFoundException("Not found Stack"));
         dao.setImage(dto.getImage());
         dao.setStackType(dto.getStackType());

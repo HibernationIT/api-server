@@ -1,10 +1,10 @@
 package app.hbnationit.apiserver.apis.homepage.services;
 
-import app.hbnationit.apiserver.apis.homepage.models.Blog;
-import app.hbnationit.apiserver.apis.homepage.models.dto.AddBlogRequest;
-import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyBlogRequest;
-import app.hbnationit.apiserver.apis.homepage.models.vo.BlogResponse;
-import app.hbnationit.apiserver.apis.homepage.models.vo.BlogsResponse;
+import app.hbnationit.apiserver.apis.homepage.models.HpBlog;
+import app.hbnationit.apiserver.apis.homepage.models.dto.AddHpBlogRequest;
+import app.hbnationit.apiserver.apis.homepage.models.dto.ModifyHpBlogRequest;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpBlogResponse;
+import app.hbnationit.apiserver.apis.homepage.models.vo.HpBlogsResponse;
 import app.hbnationit.apiserver.apis.homepage.repositories.BlogRepository;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -31,15 +31,15 @@ public class BlogService {
         this.queryFactory = queryFactory;
     }
 
-    public Blog findBlog(Long id) {
+    public HpBlog findBlog(Long id) {
         return repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found Blog"));
     }
 
-    public BlogResponse findBlogVo(Long id) {
-        Blog dao = findBlog(id);
+    public HpBlogResponse findBlogVo(Long id) {
+        HpBlog dao = findBlog(id);
         if (!dao.getView()) { throw new EntityNotFoundException("Not found Blog"); }
-        return BlogResponse.builder()
+        return HpBlogResponse.builder()
                 .id(dao.getId())
                 .name(dao.getName())
                 .description(dao.getDescription())
@@ -50,33 +50,33 @@ public class BlogService {
                 .build();
     }
 
-    public Page<Blog> findBlogs(
+    public Page<HpBlog> findBlogs(
             Pageable pageable, String name, String tags, String description
     ) {
         JPAQuery<Long> countQuery = queryFactory.select(blog.count()).from(blog);
-        JPAQuery<Blog> contentQuery = queryFactory.selectFrom(blog);
+        JPAQuery<HpBlog> contentQuery = queryFactory.selectFrom(blog);
         setQuery(countQuery, name, tags, description);
         setQuery(contentQuery, name, tags, description);
 
-        List<Blog> contents = contentQuery.fetch();
+        List<HpBlog> contents = contentQuery.fetch();
         Long count = countQuery.fetchOne();
 
         return new PageImpl<>(contents, pageable, count);
     }
 
-    public Page<BlogsResponse> findBlogsVo(
+    public Page<HpBlogsResponse> findBlogsVo(
             Pageable pageable, String name, String tags, String description
     ) {
         JPAQuery<Long> countQuery = queryFactory.select(blog.count()).from(blog).where(blog.view.isTrue());
-        JPAQuery<Blog> contentQuery = queryFactory.selectFrom(blog).where(blog.view.isTrue());
+        JPAQuery<HpBlog> contentQuery = queryFactory.selectFrom(blog).where(blog.view.isTrue());
         setQuery(countQuery, name, tags, description);
         setQuery(contentQuery, name, tags, description);
 
-        List<Blog> contents = contentQuery.fetch();
+        List<HpBlog> contents = contentQuery.fetch();
         Long count = countQuery.fetchOne();
 
         return new PageImpl<>(contents, pageable, count)
-                .map(dao -> BlogsResponse.builder()
+                .map(dao -> HpBlogsResponse.builder()
                     .id(dao.getId())
                     .name(dao.getName())
                     .description(dao.getDescription())
@@ -88,10 +88,10 @@ public class BlogService {
     }
 
     @Transactional
-    public Blog addBlog(AddBlogRequest dto) {
+    public HpBlog addBlog(AddHpBlogRequest dto) {
         String tags = String.join(",", dto.getTags());
 
-        Blog dao = Blog.builder()
+        HpBlog dao = HpBlog.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .tags(tags)
@@ -103,8 +103,8 @@ public class BlogService {
     }
 
     @Transactional
-    public Blog modifyBlog(Long id, ModifyBlogRequest dto) {
-        Blog dao = repository.findById(id).orElseThrow(() ->
+    public HpBlog modifyBlog(Long id, ModifyHpBlogRequest dto) {
+        HpBlog dao = repository.findById(id).orElseThrow(() ->
                 new EntityNotFoundException("Not found Blog"));
         String tags = String.join(",", dto.getTags());
         dao.setName(dto.getName());
