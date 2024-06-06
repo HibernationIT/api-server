@@ -42,10 +42,3 @@ jobs:
           file: ./Dockerfile
           platforms: linux/arm64
           tags: ${{ secrets.OCI_REGISTRY_URL }}/${{ env.app-name }}:${{ github.sha }}
-
-  deploy:
-    needs: build
-    uses: HibernationIT/k3s/.github/workflows/deploy.yml@master
-    with:
-      app-name: ${{ needs.build.outputs.app-name }}
-      tag: ${{ github.sha }}
