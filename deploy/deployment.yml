@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-server
+  labels:
+    app.kubernetes.io/name: api-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-server
+  template:
+    metadata:
+      labels:
+        app: api-server
+    spec:
+      containers:
+        - name: api-server
+          image: api-server:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: hbnation-config
+                  key: REDIS_HOST
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: hbnation-config
+                  key: REDIS_PORT
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: hbnation-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: hbnation-config
+                  key: DB_PORT
+            - name: DB_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: hbnation-config
+                  key: DB_DATABASE
+            - name: DB_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: hbnation-config
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: hbnation-config
+                  key: DB_PASSWORD
+            - name: SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: hbnation-config
+                  key: SECRET_KEY
+            - name: OCI_SMTP_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: hbnation-config
+                  key: OCI_SMTP_USERNAME
+            - name: OCI_SMTP_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  name: hbnation-config
+                  key: OCI_SMTP_PASSWORD
+      imagePullSecrets:
+        - name: docker-registry
