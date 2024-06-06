@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static app.hbnationit.apiserver.apis.homepage.models.QProject.*;
-import static app.hbnationit.apiserver.apis.homepage.models.QStack.*;
+import static app.hbnationit.apiserver.apis.homepage.models.QHpProject.*;
+import static app.hbnationit.apiserver.apis.homepage.models.QHpStack.*;
 import static com.querydsl.core.group.GroupBy.*;
 
 @Service
@@ -40,24 +40,24 @@ public class ProjectService {
 
     public HpProjectResponse findProjectVo(Long id) {
         List<HpProjectResponse> vo = queryFactory
-                .from(project)
-                .join(stack).on(project.stacks.contains(stack.name))
-                .where(project.id.eq(id))
-                .where(project.view.isTrue())
+                .from(hpProject)
+                .join(hpStack).on(hpProject.stacks.contains(hpStack.name))
+                .where(hpProject.id.eq(id))
+                .where(hpProject.view.isTrue())
                 .transform(
-                        groupBy(project.id).list(
+                        groupBy(hpProject.id).list(
                                 Projections.fields(HpProjectResponse.class,
-                                        project.id,
-                                        project.name,
-                                        project.link,
-                                        project.description,
+                                        hpProject.id,
+                                        hpProject.name,
+                                        hpProject.link,
+                                        hpProject.description,
                                         GroupBy.set(Projections.fields(HpProjectResponse.Stack.class,
-                                                stack.name,
-                                                stack.image
+                                                hpStack.name,
+                                                hpStack.image
                                         )).as("stacks"),
-                                        project.image,
-                                        project.content,
-                                        project.createdAt
+                                        hpProject.image,
+                                        hpProject.content,
+                                        hpProject.createdAt
                                 )
                         )
                 );
@@ -71,8 +71,8 @@ public class ProjectService {
     public Page<HpProject> findProjects(
             Pageable pageable, String name, String stacks, String description
     ) {
-        JPAQuery<Long> countQuery = queryFactory.select(project.count()).from(project);
-        JPAQuery<HpProject> contentsQuery = queryFactory.selectFrom(project);
+        JPAQuery<Long> countQuery = queryFactory.select(hpProject.count()).from(hpProject);
+        JPAQuery<HpProject> contentsQuery = queryFactory.selectFrom(hpProject);
         setQuery(countQuery, name, stacks, description);
         setQuery(contentsQuery, name, stacks, description);
 
@@ -85,26 +85,26 @@ public class ProjectService {
     public Page<HpProjectsResponse> findProjectsVo(
             Pageable pageable, String name, String stacks, String description
     ) {
-        JPAQuery<?> countQuery = queryFactory.select(project.count()).from(project).where(project.view.isTrue());
+        JPAQuery<?> countQuery = queryFactory.select(hpProject.count()).from(hpProject).where(hpProject.view.isTrue());
         JPAQuery<?> contentsQuery = queryFactory
-                .from(project).where(project.view.isTrue())
-                .join(stack).on(project.stacks.contains(stack.name));
+                .from(hpProject).where(hpProject.view.isTrue())
+                .join(hpStack).on(hpProject.stacks.contains(hpStack.name));
         setQuery(countQuery, name, stacks, description);
         setQuery(contentsQuery, name, stacks, description);
 
         List<HpProjectsResponse> contents = contentsQuery.transform(
-                groupBy(project.id).list(
+                groupBy(hpProject.id).list(
                         Projections.fields(HpProjectsResponse.class,
-                                project.id,
-                                project.name,
-                                project.link,
-                                project.description,
+                                hpProject.id,
+                                hpProject.name,
+                                hpProject.link,
+                                hpProject.description,
                                 GroupBy.set(Projections.fields(HpProjectsResponse.Stack.class,
-                                        stack.name,
-                                        stack.image
+                                        hpStack.name,
+                                        hpStack.image
                                 )).as("stacks"),
-                                project.image,
-                                project.createdAt
+                                hpProject.image,
+                                hpProject.createdAt
                         )
                 )
         );
@@ -151,16 +151,16 @@ public class ProjectService {
 
     private void setQuery(JPAQuery<?> query, String name, String stacks, String description) {
         if (name != null && description == null) {
-            query.where(project.name.toUpperCase().contains(name.toUpperCase()));
+            query.where(hpProject.name.toUpperCase().contains(name.toUpperCase()));
         } else if (name == null && description != null) {
-            query.where(project.description.toUpperCase().contains(description.toUpperCase()));
+            query.where(hpProject.description.toUpperCase().contains(description.toUpperCase()));
         } else if (name != null) {
-            query.where(project.name.toUpperCase().contains(name.toUpperCase())
-                    .or(project.description.toUpperCase().contains(description.toUpperCase())));
+            query.where(hpProject.name.toUpperCase().contains(name.toUpperCase())
+                    .or(hpProject.description.toUpperCase().contains(description.toUpperCase())));
         }
         if (stacks != null) {
             for (String s : stacks.trim().split(",")) {
-                query.where(project.stacks.contains(s));
+                query.where(hpProject.stacks.contains(s));
             }
         }
     }

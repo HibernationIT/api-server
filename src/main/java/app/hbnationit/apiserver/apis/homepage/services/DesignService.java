@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import static app.hbnationit.apiserver.apis.homepage.models.QDesign.*;
+import static app.hbnationit.apiserver.apis.homepage.models.QHpDesign.*;
 
 @Service
 public class DesignService {
@@ -53,8 +53,8 @@ public class DesignService {
     public Page<HpDesign> findDesigns(
             Pageable pageable, String name, String description
     ) {
-        JPAQuery<Long> countQuery = queryFactory.select(design.count()).from(design);
-        JPAQuery<HpDesign> contentQuery = queryFactory.selectFrom(design);
+        JPAQuery<Long> countQuery = queryFactory.select(hpDesign.count()).from(hpDesign);
+        JPAQuery<HpDesign> contentQuery = queryFactory.selectFrom(hpDesign);
         setQuery(countQuery, name, description);
         setQuery(contentQuery, name, description);
 
@@ -67,8 +67,8 @@ public class DesignService {
     public Page<HpDesignsResponse> findDesignsVo(
             Pageable pageable, String name, String description
     ) {
-        JPAQuery<Long> countQuery = queryFactory.select(design.count()).from(design).where(design.view.isTrue());
-        JPAQuery<HpDesign> contentQuery = queryFactory.selectFrom(design).where(design.view.isTrue());
+        JPAQuery<Long> countQuery = queryFactory.select(hpDesign.count()).from(hpDesign).where(hpDesign.view.isTrue());
+        JPAQuery<HpDesign> contentQuery = queryFactory.selectFrom(hpDesign).where(hpDesign.view.isTrue());
         setQuery(countQuery, name, description);
         setQuery(contentQuery, name, description);
 
@@ -123,12 +123,12 @@ public class DesignService {
 
     private void setQuery(JPAQuery<?> query, String name, String description) {
         if (name != null && description == null) {
-            query.where(design.name.toUpperCase().contains(name.toUpperCase()));
+            query.where(hpDesign.name.toUpperCase().contains(name.toUpperCase()));
         } else if (name == null && description != null) {
-            query.where(design.description.toUpperCase().contains(description.toUpperCase()));
+            query.where(hpDesign.description.toUpperCase().contains(description.toUpperCase()));
         } else if (name != null) {
-            query.where(design.name.toUpperCase().contains(name.toUpperCase())
-                    .or(design.description.toUpperCase().contains(description.toUpperCase())));
+            query.where(hpDesign.name.toUpperCase().contains(name.toUpperCase())
+                    .or(hpDesign.description.toUpperCase().contains(description.toUpperCase())));
         }
     }
 }

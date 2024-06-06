@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import static app.hbnationit.apiserver.apis.homepage.models.QBlog.*;
+import static app.hbnationit.apiserver.apis.homepage.models.QHpBlog.*;
 
 @Service
 public class BlogService {
@@ -53,8 +53,8 @@ public class BlogService {
     public Page<HpBlog> findBlogs(
             Pageable pageable, String name, String tags, String description
     ) {
-        JPAQuery<Long> countQuery = queryFactory.select(blog.count()).from(blog);
-        JPAQuery<HpBlog> contentQuery = queryFactory.selectFrom(blog);
+        JPAQuery<Long> countQuery = queryFactory.select(hpBlog.count()).from(hpBlog);
+        JPAQuery<HpBlog> contentQuery = queryFactory.selectFrom(hpBlog);
         setQuery(countQuery, name, tags, description);
         setQuery(contentQuery, name, tags, description);
 
@@ -67,8 +67,8 @@ public class BlogService {
     public Page<HpBlogsResponse> findBlogsVo(
             Pageable pageable, String name, String tags, String description
     ) {
-        JPAQuery<Long> countQuery = queryFactory.select(blog.count()).from(blog).where(blog.view.isTrue());
-        JPAQuery<HpBlog> contentQuery = queryFactory.selectFrom(blog).where(blog.view.isTrue());
+        JPAQuery<Long> countQuery = queryFactory.select(hpBlog.count()).from(hpBlog).where(hpBlog.view.isTrue());
+        JPAQuery<HpBlog> contentQuery = queryFactory.selectFrom(hpBlog).where(hpBlog.view.isTrue());
         setQuery(countQuery, name, tags, description);
         setQuery(contentQuery, name, tags, description);
 
@@ -124,16 +124,16 @@ public class BlogService {
 
     private void setQuery(JPAQuery<?> query, String name, String tags, String description) {
         if (name != null && description == null) {
-            query.where(blog.name.toUpperCase().contains(name.toUpperCase()));
+            query.where(hpBlog.name.toUpperCase().contains(name.toUpperCase()));
         } else if (name == null && description != null) {
-            query.where(blog.description.toUpperCase().contains(description.toUpperCase()));
+            query.where(hpBlog.description.toUpperCase().contains(description.toUpperCase()));
         } else if (name != null) {
-            query.where(blog.name.toUpperCase().contains(name.toUpperCase())
-                    .or(blog.description.toUpperCase().contains(description.toUpperCase())));
+            query.where(hpBlog.name.toUpperCase().contains(name.toUpperCase())
+                    .or(hpBlog.description.toUpperCase().contains(description.toUpperCase())));
         }
         if (tags != null) {
             for (String s : tags.trim().split(",")) {
-                query.where(blog.tags.contains(s));
+                query.where(hpBlog.tags.contains(s));
             }
         }
     }
