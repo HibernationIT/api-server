@@ -21,6 +21,6 @@ spec:
             - containerPort: 8080
           envFrom:
             - configMapRef:
-              name: hbnation-config
+                name: hbnation-config
       imagePullSecrets:
         - name: docker-registry
