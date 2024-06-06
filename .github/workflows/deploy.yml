@@ -1,0 +1,29 @@
+name: Deploy my Server
+on:
+  push:
+    branches: [main]
+
+env:
+  app-name: "api-server"
+
+jobs:
+  build:
+    name: build project
+    runs-on: ubuntu-latest
+
+    outputs:
+      app-name: ${{ env.app-name }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: JDK Setup
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17"
+          distribution: "temurin"
+          cache: maven
+
+      - name: Build
+        run: mvn -B package -DskipTests=true --file pom.xml
