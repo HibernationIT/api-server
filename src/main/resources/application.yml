@@ -32,3 +32,11 @@ spring:
     host: smtp.email.ap-chuncheon-1.oci.oraclecloud.com
     username: ${OCI_SMTP_USERNAME}
     password: ${OCI_SMTP_PASSWORD}
+
+  oci:
+    bucket: ${OCI_BUCKET_NAME}
+    namespace: ${OCI_NAMESPACE}
+    private-key: ${OCI_PRIVATE_KEY}
+    tenant-id: ${OCI_TENANT_ID}
+    user-id: ${OCI_USER_ID}
+    fingerprint: ${OCI_FINGERPRINT}
