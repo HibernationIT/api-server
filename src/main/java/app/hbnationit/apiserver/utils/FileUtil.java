@@ -51,6 +51,7 @@ public class FileUtil implements InitializingBean, DisposableBean {
                 .objectName(fileName)
                 .contentLength(file.getSize())
                 .putObjectBody(inputStream)
+                .contentType(file.getContentType())
                 .build();
         storage.putObject(putObjectRequest);
 
